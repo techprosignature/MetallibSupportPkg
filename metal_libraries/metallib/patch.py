@@ -193,11 +193,11 @@ class MetallibPatch:
         Patch AIR versioning to 2.6
         """
         def patch_line(line: str) -> str:
-            if r'!{i32 2, i32 7, i32 0}' in line:
-                return line.replace("i32 7", "i32 6")
+            # Normalize ANY AIR 2.x version → 2.6
+            line = re.sub(r'!{i32 2, i32 (\d+), i32 0}', '!{i32 2, i32 6, i32 0}', line)
 
-            if r'!{!"Metal", i32 3, i32 2, i32 0}' in line:
-                return line.replace("i32 2", "i32 1")
+            # Normalize ANY Metal 3.x minor version → 1
+            line = re.sub(r'!{!"Metal", i32 3, i32 (\d+), i32 0}', '!{!"Metal", i32 3, i32 1, i32 0}', line)
 
             if r'@__air_sampler_state' in line and r'[2 x i64]' in line:
                 match = re.search(r"\[2 x i64\] \[i64 ([0-9]+), i64 0\]", line)
