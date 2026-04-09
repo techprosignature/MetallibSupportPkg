@@ -87,7 +87,8 @@ class MetallibPatch:
         result = subprocess.run(["/usr/bin/xcrun", "metal-objdump", "--disassemble", input], capture_output=True, text=True)
         if result.returncode != 0:
             log(result)
-            raise Exception(f"Failed to decompile {input}")
+            print(f"  - Skipping {input} - not a valid AIR object")
+            return None
 
 
         entry_point = None
@@ -322,6 +323,8 @@ class MetallibPatch:
             ll_files = []
             for air_file in Path(tmp_output).glob("*.air"):
                 ll_file = self._decompile_air_to_ll(air_file)
+                if ll_file is None:
+                   continue
                 ll_files.append(ll_file)
 
             print("- Patching .ll files")
